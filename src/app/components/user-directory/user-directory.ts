@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, signal, OnDestroy, inject, DestroyRef } from '@angular/core';
 import { BehaviorSubject,
   Subject,
   Observable,
@@ -13,7 +13,9 @@ import {
   map,
   startWith,
   tap,
+  switchMap
 } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { UserCardComponent } from '../user-card/user-card';
@@ -35,10 +37,9 @@ import { SelectedUsersComponent } from '../selected-users/selected-users';
   templateUrl: './user-directory.html',
   styleUrl: './user-directory.scss',
 })
-export class UserDirectoryComponent implements OnInit, OnDestroy {
+export class UserDirectoryComponent implements OnInit {
   private readonly userService = inject(UserService);
-  private readonly destroy$ = new Subject<void>();
-
+private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(FormBuilder);
 
 showCreateForm = signal(false);
@@ -58,29 +59,35 @@ readonly createUserForm = this.formBuilder.nonNullable.group({
 
 readonly users$ = this.usersSubject.asObservable();
 
-private readonly searchTermSubject = new Subject<string>();
+private readonly usernameSubject = new Subject<string>();
 
-readonly filteredUsers$: Observable<User[]> = combineLatest([
-  this.users$,
-  this.searchTermSubject.pipe(
-    startWith(''),
-    debounceTime(300),
-    distinctUntilChanged(),
-  ),
-]).pipe(
-  map(([users, searchTerm]) => {
-    const term = searchTerm.trim().toLowerCase();
+readonly username$ = this.usernameSubject.asObservable();
+readonly filteredUsers$: Observable<User[]> = this.username$.pipe(
+  startWith(''),
+  debounceTime(300),
+  distinctUntilChanged(),
 
-    if (!term) {
-      return users;
-    }
+  switchMap(username => {
+    const term = username.trim();
 
-    return users.filter(
-      user =>
-        user.name.toLowerCase().includes(term) ||
-        user.username.toLowerCase().includes(term),
+    const request$ = term
+      ? this.userService.searchUsers(term)
+      : this.userService.getUsers();
+
+    return request$.pipe(
+      catchError(error => {
+        console.error('Failed to search users:', error);
+
+        this.errorMessage.set(
+          'Unable to search users. Please try again.'
+        );
+
+        return of([] as User[]);
+      }),
+
+      tap(() => this.errorMessage.set(null))
     );
-  }),
+  })
 );
   selectedUsers = signal<User[]>([]);
   loading = signal<boolean>(true);
@@ -90,10 +97,7 @@ selectedUserId = signal<string | number | null>(null);
     this.loadUsers();
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
+
 
  private loadUsers(): void {
   this.loading.set(true);
@@ -113,7 +117,7 @@ selectedUserId = signal<string | number | null>(null);
         return of([] as User[]);
       }),
       finalize(() => this.loading.set(false)),
-      takeUntil(this.destroy$),
+  takeUntilDestroyed(this.destroyRef),
     )
     .subscribe();
 }
@@ -153,7 +157,7 @@ createUser(): void {
         return of(null);
       }),
       finalize(() => this.creatingUser.set(false)),
-      takeUntil(this.destroy$)
+  takeUntilDestroyed(this.destroyRef),
     )
     .subscribe((createdUser) => {
       if (!createdUser) {
@@ -176,8 +180,8 @@ cancelCreateForm(): void {
   this.createError.set(null);
   this.createSuccess.set(null);
 }
-  onSearch(term: string): void {
-  this.searchTermSubject.next(term);
+  onSearch(username: string): void {
+  this.usernameSubject.next(username);
 }
 
   // private setupSearch(): void {
@@ -236,7 +240,7 @@ cancelCreateForm(): void {
 
         return of(null);
       }),
-      takeUntil(this.destroy$)
+  takeUntilDestroyed(this.destroyRef),
     )
     .subscribe((users) => {
       if (users === null) {
@@ -316,7 +320,7 @@ deleteUser(userId: string | number): void {
         );
         return of(null);
       }),
-      takeUntil(this.destroy$),
+  takeUntilDestroyed(this.destroyRef),
     )
     .subscribe(result => {
       if (result === null) {
