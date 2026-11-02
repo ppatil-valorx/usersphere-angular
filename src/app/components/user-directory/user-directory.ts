@@ -3,7 +3,7 @@ import { BehaviorSubject,
   Subject,
   Observable,
   of,
-  combineLatest,} from 'rxjs';
+  combineLatest,forkJoin} from 'rxjs';
 import {
   catchError,
   debounceTime,
@@ -200,20 +200,54 @@ cancelCreateForm(): void {
   //     });
   // }
 
-  selectUser(user: User): void {
-    const selected = this.selectedUsers();
+ selectUser(user: User): void {
+  const selected = this.selectedUsers();
 
-    if (selected.some((item) => item.id === user.id)) {
-      return;
-    }
-
-    if (selected.length >= 5) {
-      alert('You can select a maximum of 5 users.');
-      return;
-    }
-
-    this.selectedUsers.update((current) => [...current, user]);
+  // Prevent selecting the same user twice.
+  if (selected.some((item) => String(item.id) === String(user.id))) {
+    return;
   }
+
+  // Allow a maximum of 5 users.
+  if (selected.length >= 5) {
+    alert('You can select a maximum of 5 users.');
+    return;
+  }
+
+  // Create the list of users we want to select.
+  const usersToSelect = [...selected, user];
+
+  // Fetch the details of every selected user.
+  const requests = usersToSelect.map((selectedUser) =>
+    this.userService.getUserById(selectedUser.id)
+  );
+
+  // Clear the current selection while the requests are pending.
+  this.selectedUsers.set([]);
+
+  forkJoin(requests)
+    .pipe(
+      catchError((error) => {
+        console.error('Failed to fetch selected users:', error);
+
+        this.errorMessage.set(
+          'Unable to load selected users. Please try again.'
+        );
+
+        return of(null);
+      }),
+      takeUntil(this.destroy$)
+    )
+    .subscribe((users) => {
+      if (users === null) {
+        return;
+      }
+
+      // Update the selection only after every request succeeds.
+      this.selectedUsers.set(users);
+      this.errorMessage.set(null);
+    });
+}
 
   removeUser(userId: string | number): void {
   this.selectedUsers.update((current) =>
