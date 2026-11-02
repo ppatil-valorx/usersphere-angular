@@ -1,0 +1,191 @@
+@if (state$ | async; as state) {
+  @if (state.loading) {
+    <section class="selected-section">
+      <h3>Loading user details...</h3>
+      <p>Please wait while we fetch the user's information.</p>
+    </section>
+  } @else if (state.user; as user) {
+    <section class="selected-section" id="user-details">
+      <div class="section-heading">
+        <div>
+          <h3>User Details</h3>
+          <p>Complete profile information for {{ user.name }}.</p>
+        </div>
+
+        @if (!isEditing()) {
+          <button
+            type="button"
+            class="select-btn"
+            (click)="startEditing(user)"
+          >
+            Edit User
+          </button>
+        }
+      </div>
+
+      @if (state.error) {
+        <p class="error-message" role="alert">
+          {{ state.error }}
+        </p>
+      }
+
+      @if (state.success) {
+        <p class="success-message" role="status">
+          {{ state.success }}
+        </p>
+      }
+
+      @if (isEditing()) {
+        <form
+          [formGroup]="userForm"
+          (ngSubmit)="saveUser(user)"
+        >
+          <div class="details-grid">
+            <article class="selected-user-card">
+              <div>
+                <label for="user-name">Name</label>
+                <input
+                  id="user-name"
+                  type="text"
+                  formControlName="name"
+                />
+
+                @if (
+                  userForm.controls.name.touched &&
+                  userForm.controls.name.invalid
+                ) {
+                  <small class="error-message">
+                    Name is required.
+                  </small>
+                }
+              </div>
+            </article>
+
+            <article class="selected-user-card">
+              <div>
+                <label for="user-username">Username</label>
+                <input
+                  id="user-username"
+                  type="text"
+                  formControlName="username"
+                />
+
+                @if (
+                  userForm.controls.username.touched &&
+                  userForm.controls.username.invalid
+                ) {
+                  <small class="error-message">
+                    Username is required.
+                  </small>
+                }
+              </div>
+            </article>
+
+            <article class="selected-user-card">
+              <div>
+                <label for="user-email">Email</label>
+                <input
+                  id="user-email"
+                  type="email"
+                  formControlName="email"
+                />
+
+                @if (
+                  userForm.controls.email.touched &&
+                  userForm.controls.email.invalid
+                ) {
+                  <small class="error-message">
+                    Enter a valid email address.
+                  </small>
+                }
+              </div>
+            </article>
+
+            <article class="selected-user-card">
+              <div>
+                <label for="user-phone">Phone</label>
+                <input
+                  id="user-phone"
+                  type="text"
+                  formControlName="phone"
+                />
+              </div>
+            </article>
+
+            <article class="selected-user-card">
+              <div>
+                <label for="user-website">Website</label>
+                <input
+                  id="user-website"
+                  type="text"
+                  formControlName="website"
+                />
+              </div>
+            </article>
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="select-btn"
+              [disabled]="state.saving"
+            >
+              {{ state.saving ? 'Saving...' : 'Save Changes' }}
+            </button>
+
+            <button
+              type="button"
+              class="remove-btn"
+              [disabled]="state.saving"
+              (click)="cancelEditing(user)"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      } @else {
+        <div class="details-grid">
+          <article class="selected-user-card">
+            <div>
+              <h4>Name</h4>
+              <p>{{ user.name }}</p>
+            </div>
+          </article>
+
+          <article class="selected-user-card">
+            <div>
+              <h4>Username</h4>
+              <p>{{ user.username }}</p>
+            </div>
+          </article>
+
+          <article class="selected-user-card">
+            <div>
+              <h4>Email</h4>
+              <p>{{ user.email }}</p>
+            </div>
+          </article>
+
+          <article class="selected-user-card">
+            <div>
+              <h4>Phone</h4>
+              <p>{{ user.phone || 'Not provided' }}</p>
+            </div>
+          </article>
+
+          <article class="selected-user-card">
+            <div>
+              <h4>Website</h4>
+              <p>{{ user.website || 'Not provided' }}</p>
+            </div>
+          </article>
+        </div>
+      }
+    </section>
+  } @else if (state.error) {
+    <section class="selected-section">
+      <h3>Unable to load user</h3>
+      <p class="error-message">{{ state.error }}</p>
+    </section>
+  }
+}

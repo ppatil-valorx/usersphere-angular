@@ -1,0 +1,119 @@
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.user-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(139, 92, 246, 0.2);
+  font-weight: 700;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-info h3 {
+  margin: 0 0 5px;
+}
+
+.user-info p {
+  margin: 4px 0;
+  overflow-wrap: anywhere;
+}
+
+.user-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.select-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .user-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .user-actions {
+    width: 100%;
+  }
+}
+
+.select-btn {
+  padding: 10px 16px;
+  border: 1px solid #8b5cf6;
+  border-radius: 6px;
+  background: #8b5cf6;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.select-btn:hover:not(:disabled) {
+  background: #7c3aed;
+}
+
+.select-btn:disabled {
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+/* Keep the selected button visible */
+.select-btn:disabled {
+  background: #3b2b5e;
+  color: #e9ddff;
+  border-color: #8b5cf6;
+}
+
+.user-checkbox {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: #9b7bea;
+  cursor: pointer;
+}
+
+.user-checkbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.delete-btn {
+  padding: 9px 14px;
+  border: 1px solid rgba(255, 120, 140, 0.4);
+  border-radius: 8px;
+  background: transparent;
+  color: #ff9aa9;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.delete-btn:hover {
+  background: rgba(255, 120, 140, 0.12);
+}
+
+.delete-btn:focus-visible {
+  outline: 2px solid #ff9aa9;
+  outline-offset: 2px;
+}

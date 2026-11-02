@@ -1,0 +1,200 @@
+<!-- Dashboard introduction -->
+<section class="welcome-section">
+  <div>
+    <p class="eyebrow">USER WORKSPACE</p>
+
+    <h2>Manage your users<span>.</span></h2>
+
+    <p class="welcome-description">
+      Search profiles, select users, and manage their information
+      from one place.
+    </p>
+  </div>
+
+  <div class="user-count">
+    <span class="count-label">TOTAL USERS</span>
+
+<strong>{{ (users$ | async)?.length ?? 0 }}</strong>
+    <span class="count-note">Users loaded from API</span>
+  </div>
+</section>
+
+<!-- User directory -->
+<section class="directory-section">
+<div class="section-heading">
+  <div>
+    <h3>User Directory</h3>
+    <p>Browse and manage user profiles.</p>
+  </div>
+
+  <div class="directory-actions">
+    <span class="selection-badge">
+      {{ selectedUsers().length }} / 5 selected
+    </span>
+
+    <button
+      type="button"
+      class="create-user-btn"
+      (click)="openCreateForm()"
+    >
+      + Create User
+    </button>
+  </div>
+</div>
+
+  <!-- Search component -->
+  <app-user-search
+  (searchChange)="onSearch($event)"
+></app-user-search>
+
+  <!-- User list -->
+  <div class="user-list">
+    @if (loading()) {
+      <div class="empty-state">
+        <h3>Loading users...</h3>
+        <p>Please wait while we fetch user data.</p>
+      </div>
+    } @else if (errorMessage()) {
+      <div class="empty-state">
+        <h3>Something went wrong</h3>
+        <p>{{ errorMessage() }}</p>
+      </div>
+    } @else {
+@for (user of (filteredUsers$ | async) ?? []; track user.id) {        
+        <app-user-card
+          [user]="user"
+          [selected]="isSelected(user.id)"
+          [selectionDisabled]="
+            selectedUsers().length >= 5 && !isSelected(user.id)
+          "
+          (selectUser)="selectUser($event)"
+          (viewDetails)="viewUserDetails($event)"
+            (deleteUser)="deleteUser($event)"
+
+        ></app-user-card>
+        
+      } @empty {
+        <div class="empty-state">
+          <h3>No users found</h3>
+          <p>No users are currently available.</p>
+        </div>
+      }
+    }
+  </div>
+  @if (showCreateForm()) {
+  <form
+    class="create-user-form"
+    [formGroup]="createUserForm"
+    (ngSubmit)="createUser()"
+  >
+    <h3>Create a New User</h3>
+
+    <label for="create-name">Full Name *</label>
+    <input
+      id="create-name"
+      type="text"
+      formControlName="name"
+      placeholder="Enter full name"
+    />
+
+    @if (
+      createUserForm.controls.name.touched &&
+      createUserForm.controls.name.invalid
+    ) {
+      <small class="field-error">Name is required.</small>
+    }
+
+    <label for="create-username">Username *</label>
+    <input
+      id="create-username"
+      type="text"
+      formControlName="username"
+      placeholder="Enter username"
+    />
+
+    @if (
+      createUserForm.controls.username.touched &&
+      createUserForm.controls.username.invalid
+    ) {
+      <small class="field-error">Username is required.</small>
+    }
+
+    <label for="create-email">Email *</label>
+    <input
+      id="create-email"
+      type="email"
+      formControlName="email"
+      placeholder="Enter email address"
+    />
+
+    @if (
+      createUserForm.controls.email.touched &&
+      createUserForm.controls.email.errors?.['required']
+    ) {
+      <small class="field-error">Email is required.</small>
+    }
+
+    @if (
+      createUserForm.controls.email.touched &&
+      createUserForm.controls.email.errors?.['email']
+    ) {
+      <small class="field-error">Enter a valid email address.</small>
+    }
+
+    <label for="create-phone">Phone</label>
+    <input
+      id="create-phone"
+      type="text"
+      formControlName="phone"
+      placeholder="Enter phone number"
+    />
+
+    <label for="create-website">Website</label>
+    <input
+      id="create-website"
+      type="text"
+      formControlName="website"
+      placeholder="Enter website"
+    />
+
+    @if (createError()) {
+      <p class="form-error">{{ createError() }}</p>
+    }
+
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="create-user-btn"
+        [disabled]="creatingUser()"
+      >
+        {{ creatingUser() ? 'Creating...' : 'Create User' }}
+      </button>
+
+      <button
+        type="button"
+        class="cancel-btn"
+        (click)="cancelCreateForm()"
+      >
+        Cancel
+      </button>
+    </div>
+  </form>
+}
+
+@if (createSuccess()) {
+  <p class="form-success">{{ createSuccess() }}</p>
+}
+</section>
+@if (selectedUserId() !== null) {
+  <app-user-details
+    [userId]="selectedUserId()"
+    (userUpdated)="onUserUpdated($event)"
+  ></app-user-details>
+}
+
+
+<app-selected-users
+  [users]="selectedUsers()"
+  (removeUser)="removeUser($event)"
+  
+></app-selected-users>

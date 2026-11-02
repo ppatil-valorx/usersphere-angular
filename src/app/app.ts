@@ -1,11 +1,21 @@
+
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { SidebarComponent } from './components/sidebar/sidebar';
+import { HeaderComponent } from './components/header/header';
+import { UserDirectoryComponent } from './components/user-directory/user-directory';
+import { SelectedUsersComponent } from './components/selected-users/selected-users';
 
 @Component({
-  imports: [RouterOutlet],
   selector: 'app-root',
-  styleUrl: './app.scss',
+  standalone: true,
+  imports: [
+    SidebarComponent,
+    HeaderComponent,
+    UserDirectoryComponent,
+    SelectedUsersComponent
+  ],
   templateUrl: './app.html',
+  styleUrl: './app.scss'
 })
 export class App {
   protected readonly title = signal('usersphere');

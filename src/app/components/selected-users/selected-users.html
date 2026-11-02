@@ -1,0 +1,44 @@
+<section class="selected-users-section">
+  <div class="selected-heading">
+    <div>
+      <h3>Selected Users</h3>
+      <p>Users you've selected for comparison or further action.</p>
+    </div>
+
+    <span class="selection-count">
+      {{ users().length }} / 5
+    </span>
+  </div>
+
+  @if (users().length === 0) {
+    <div class="selected-empty">
+      <p>No users selected yet.</p>
+      <span>Use the checkboxes in the User Directory to select users.</span>
+    </div>
+  } @else {
+    <div class="selected-users-list">
+      @for (user of users(); track user.id) {
+        <article class="selected-user-card">
+          <div class="selected-user-avatar">
+            {{ user.name.charAt(0) }}
+          </div>
+
+          <div class="selected-user-info">
+            <h4>{{ user.name }}</h4>
+            <p>@{{ user.username }}</p>
+            <p>{{ user.email }}</p>
+          </div>
+
+          <button
+            type="button"
+            class="remove-user-btn"
+            (click)="removeUser.emit(user.id)"
+            [attr.aria-label]="'Remove ' + user.name"
+          >
+            Remove
+          </button>
+        </article>
+      }
+    </div>
+  }
+</section>

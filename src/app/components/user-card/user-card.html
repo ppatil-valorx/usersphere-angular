@@ -1,0 +1,38 @@
+<article class="user-card">
+  <input
+    type="checkbox"
+    class="user-checkbox"
+    [checked]="selected()"
+    [disabled]="selectionDisabled() && !selected()"
+    (change)="onSelect()"
+    [attr.aria-label]="'Select ' + user().name"
+  />
+
+  <div class="user-avatar">
+    {{ user().name.charAt(0) }}
+  </div>
+
+  <div class="user-info">
+    <h3>{{ user().name }}</h3>
+    <p>@{{ user().username }}</p>
+    <p>{{ user().email }}</p>
+  </div>
+
+  <div class="user-actions">
+    <button
+      type="button"
+      class="select-btn"
+      (click)="onViewDetails()"
+    >
+      View Details
+    </button>
+
+    <button
+      type="button"
+      class="delete-btn"
+      (click)="onDelete()"
+    >
+      Delete
+    </button>
+  </div>
+</article>

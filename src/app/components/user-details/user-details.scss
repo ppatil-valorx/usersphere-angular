@@ -1,0 +1,133 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.details-section {
+  margin-top: 30px;
+  padding: 24px;
+  border: 1px solid #302a3b;
+  border-radius: 14px;
+  background: #15121c;
+}
+
+.details-heading {
+  margin-bottom: 22px;
+}
+
+.details-heading h3 {
+  margin: 0 0 7px;
+  color: #f0edf7;
+  font-size: 15px;
+}
+
+.details-heading p {
+  margin: 0;
+  color: #827b91;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.detail-field {
+  min-width: 0;
+}
+
+.detail-field label {
+  display: block;
+  margin-bottom: 8px;
+  color: #918a9f;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.detail-field p {
+  overflow-wrap: anywhere;
+  margin: 0;
+  color: #e7e2f0;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.detail-field input {
+  width: 100%;
+  min-height: 40px;
+  padding: 10px 12px;
+  border: 1px solid #383041;
+  border-radius: 8px;
+  outline: none;
+  background: #0f0d14;
+  color: #f1f0f7;
+  font-size: 12px;
+}
+
+.detail-field input:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgb(139 92 246 / 12%);
+}
+
+.details-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.details-actions button {
+  padding: 10px 15px;
+  border: 1px solid #51416d;
+  border-radius: 8px;
+  background: #211a30;
+  color: #c4b5fd;
+  font-size: 11px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.details-actions button:hover {
+  background: #302343;
+}
+
+.details-actions button.primary-btn {
+  border-color: #7c3aed;
+  background: #7c3aed;
+  color: #fff;
+}
+
+.details-actions button.primary-btn:hover {
+  background: #6d28d9;
+}
+
+.details-actions button.cancel-btn {
+  border-color: #383041;
+  background: transparent;
+  color: #a9a2b6;
+}
+
+.save-message {
+  margin-top: 15px;
+  color: #6ee7b7;
+  font-size: 11px;
+}
+
+.error-message {
+  margin-top: 15px;
+  color: #fda4af;
+  font-size: 11px;
+}
+
+@media (max-width: 600px) {
+  .details-section {
+    padding: 18px;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
